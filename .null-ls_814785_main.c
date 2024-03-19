@@ -144,6 +144,38 @@ void cidr_address_input(char *cidr_address, char *subnet_mask)
 	}
 
 	free(cidr_address);
+	free(subnet_mask);
+}
+//TODO understand how to handle errors
+void subnet_number_input(int subnet_number)
+{
+	printf("Number of the subnet: ");
+	int check_input = scanf("%d\n", &subnet_number);
+	if(check_input == 0)
+	{
+		fflush(stdin);
+		printf("Error in the input\n");
+		subnet_number_input(subnet_number);
+	}
+	fflush(stdin);
+	printf("Numbers of the subnet: %d\n", subnet_number);
+
+}
+//TODO understand how to handle errors
+void host_subnet_input(int subnet_number, int host_number[subnet_number])
+{
+	for(int i = 0; i < subnet_number; ++i)
+	{
+		char c = '0';
+		printf("Numbers of host for the subnet n. %d", (i + 1));
+		int check_input = scanf("%d\n", &host_number[i]);
+		if(check_input != 1)
+		{
+			scanf("%c", &c);
+			printf("You must insert numbers, you wrote: %c\n", c);
+			host_subnet_input(subnet_number, host_number);
+		}
+	}
 }
 
 //TODO call the ip_address_input, cidr_address_input and do a menu of input
@@ -151,16 +183,9 @@ void check_input(char *network_address, char *cidr_address, char *subnet_mask, i
 {
 	ip_address_input(network_address);
 	cidr_address_input(cidr_address, subnet_mask);
+	subnet_number_input(subnet_numbers);
+	host_subnet_input(subnet_numbers, number_host);
 
-	printf("Numbers of the subnet: ");
-	scanf("%d", &subnet_numbers);
-
-	for(int i = 0; i < subnet_numbers; ++i)
-	{
-	//TODO check_input if the users enter letters or something else that is not a digit
-		printf("Numbers of host for the subnet n. %d: ", (i + 1));
-		scanf("%d", &number_host[i]);
-	}
 }
 
 int main()
