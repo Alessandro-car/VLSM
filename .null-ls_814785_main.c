@@ -7,6 +7,34 @@
 #define NEW_LINE printf("\n");
 
 //TODO understand how to print error messages in red, like if it is a GUI
+
+bool check_cidr_address(char *cidr_address);
+bool check_ip_address(char *ip_address);
+char* get_subnet_mask(char *cidr_address);
+void ip_address_input(char *ip_address);
+void cidr_address_input(char *cidr_address, char* subnet_musk);
+int subnet_number_input();
+void host_subnet_input(int subnet_numbers, int host_numbers[subnet_numbers]);
+void check_input(char *ip_address, char *cidr_address, char *subnet_musk, int subnet_numbers, int host_numbers[subnet_numbers]);
+
+
+int main()
+{
+	 typedef struct ip_address
+	 {
+		 char *address;
+		 char *cidr_address;
+		 char *subnet_mask;
+	 } ip_address;
+	 ip_address network_address = { NULL, NULL, NULL };
+	 int subnet_numbers = 0;
+	 int host_number[subnet_numbers];
+
+	 printf("TODO: A menu to communicate to the users the information to continue\n");
+	 check_input(network_address.address, network_address.cidr_address, network_address.subnet_mask, subnet_numbers, host_number);
+	 return 0;
+}
+
 bool check_cidr_address(char *cidr_address)
 {
 	 if(cidr_address[0] == '\0')
@@ -46,46 +74,58 @@ bool check_cidr_address(char *cidr_address)
 	 }
 	 return true;
 }
-//TODO aggiustare questa funzione perche' il controllo del numero dei punti e del numero degli ottetti non funziona
+
 bool check_ip_address(char* ip_address)
 {
-  if(ip_address[0] == '\0')
+   if(ip_address[0] == '\0')
 	 {
-		 //TODO check input
-	 	 printf("You didn't insert the IP address\n");
+		 printf("You didn't insert the IP address\n");
 		 return false;
 	 }
 
-	 char* splitted_ip = strtok(ip_address, ".");
-	 int dots = 0;
-	 int octet = 0;
-	 while(splitted_ip != NULL)
+	 for(int i = 0; i < strlen(ip_address); ++i)
 	 {
-	 	 ++octet;
-		 for(int i = 0; i < strlen(splitted_ip); ++i)
+	 	 if(ip_address[i] == '.' && ip_address[i + 1] == '.')
 		 {
-			 if(!isdigit(splitted_ip[i]))
-			 {
-				 printf("You must enter digits!\n");
-		 		 return false;
-			 }
-		 }
-
-		 if(atoi(splitted_ip) < 0 || atoi(splitted_ip) > 255)
-		 {
-			 printf("The number must be between 0 and 255\n");
-			 return false;
-		 }
-		 else {
-		 	splitted_ip = strtok(NULL, ".");
-		 		 if(splitted_ip != NULL)
-					 ++dots;
+		 	 printf("You must insert numbers between the dots!\n");
+		 	 return false;
 		 }
 	 }
 
-	 printf("Points: %d\nOctets: %d", dots, octet);
-	 //TODO check input
-	 if(dots != 3 || octet != 4)
+	 char* splitted_ip = strtok(ip_address, ".");
+	 if(splitted_ip == NULL)
+	 {
+		 printf("You didn't inser the IP address\n");
+	 	 return false;
+	 }
+	 int dots = 0;
+	 while(splitted_ip != NULL)
+	 {
+
+		 for(int i = 0; i < strlen(splitted_ip); ++i)
+		 {
+		 	 if(!isdigit(splitted_ip[i]))
+			 {
+			 	 printf("You must insert digits");
+				 return false;
+			 }
+		 }
+
+		 if(atoi(splitted_ip) >= 0 && atoi(splitted_ip) <= 255)
+		 {
+		 	 splitted_ip = strtok(NULL, ".");
+			 if(splitted_ip != NULL)
+			 	 ++dots;
+		 } else
+		 {
+		 	 printf("The number must be between 0 and 255\n");
+			 return false;
+		 }
+	 }
+
+	 printf("Points: %d\n", dots);
+
+	 if(dots != 3)
 	 {
 		 printf("Check the input of the IP address\n");
 		 return false;
@@ -147,19 +187,12 @@ void cidr_address_input(char *cidr_address, char *subnet_mask)
 	free(subnet_mask);
 }
 //TODO understand how to handle errors
-void subnet_number_input(int subnet_number)
+int subnet_number_input()
 {
+	int subnet_number = 0;
 	printf("Number of the subnet: ");
-	int check_input = scanf("%d\n", &subnet_number);
-	if(check_input == 0)
-	{
-		fflush(stdin);
-		printf("Error in the input\n");
-		subnet_number_input(subnet_number);
-	}
-	fflush(stdin);
-	printf("Numbers of the subnet: %d\n", subnet_number);
-
+	scanf("%d", &subnet_number);
+	return subnet_number;
 }
 //TODO understand how to handle errors
 void host_subnet_input(int subnet_number, int host_number[subnet_number])
@@ -167,14 +200,8 @@ void host_subnet_input(int subnet_number, int host_number[subnet_number])
 	for(int i = 0; i < subnet_number; ++i)
 	{
 		char c = '0';
-		printf("Numbers of host for the subnet n. %d", (i + 1));
-		int check_input = scanf("%d\n", &host_number[i]);
-		if(check_input != 1)
-		{
-			scanf("%c", &c);
-			printf("You must insert numbers, you wrote: %c\n", c);
-			host_subnet_input(subnet_number, host_number);
-		}
+		printf("Numbers of host for the subnet n. %d: ", (i + 1));
+		scanf("%d", &host_number[i]);
 	}
 }
 
@@ -183,24 +210,9 @@ void check_input(char *network_address, char *cidr_address, char *subnet_mask, i
 {
 	ip_address_input(network_address);
 	cidr_address_input(cidr_address, subnet_mask);
-	subnet_number_input(subnet_numbers);
-	host_subnet_input(subnet_numbers, number_host);
+	int n_subnet = subnet_number_input();
+	host_subnet_input(n_subnet, number_host);
 
 }
 
-int main()
-{
-	 typedef struct ip_address
-	 {
-		 char *address;
-		 char *cidr_address;
-		 char *subnet_mask;
-	 } ip_address;
-	 ip_address network_address = { NULL, NULL, NULL };
-	 int subnet_numbers = 0;
-	 int host_number[subnet_numbers];
 
-	 printf("TODO: A menu to communicate to the users the information to continue\n");
-	 check_input(network_address.address, network_address.cidr_address, network_address.subnet_mask, subnet_numbers, host_number);
-	 return 0;
-}
