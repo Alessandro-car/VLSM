@@ -5,7 +5,6 @@
 #include <stdbool.h>
 #include <math.h>
 
-
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
 #define ANSI_COLOR_YELLOW  "\x1b[33m"
@@ -15,7 +14,6 @@
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
 #define LOG_ERR(message) printf("%s%s%s", ANSI_COLOR_RED, message, ANSI_COLOR_RESET)
-#define ARR_LENGTH(array) (sizeof(array) / sizeof((array)[0]))
 
 void reverse(char s[])
 {
@@ -47,11 +45,45 @@ void itoa(int n, char s[])
      reverse(s);
 }
 
-void clear_stdin_buffer();
-char* get_binary_ip_address(char* ip_address);
-char* get_decimal_address(char* binary_address);
-char* insert_dots_address(char* address, int first_octet_bits, int second_octet_bits, int third_octet_bits, int fourth_octet_bits);
+char* get_binary_number(int number, int n_bits)
+{
 
+	char* bits = calloc(n_bits, sizeof(char));
+	int *rem = calloc(1024, sizeof(int));
+	int index = 0;
+
+	while(number > 0)
+	{
+		rem[index] = number % 2;
+		number /= 2;
+		++index;
+	}
+
+	while(index < n_bits)
+	{
+		rem[index] = 0;
+		++index;
+	}
+
+	for(int i = index - 1; i >= 0; --i)
+	{
+		bits[n_bits - 1 - i] = rem[i] + '0';
+	}
+
+	return bits;
+}
+
+void clear_stdin_buffer();
+
+typedef struct ip_address
+{
+	char *address;
+	char *cidr_address;
+	char *subnet_mask;
+} ip_address;
+
+char* get_binary_ip_adress(char* ip_address);
+char* get_decimal_address(char* binary_address);
 bool check_cidr_address(char *cidr_address);
 bool check_ip_address(char *address_ip);
 char* get_subnet_mask(char *cidr_address);
@@ -60,17 +92,10 @@ char* cidr_address_input();
 int subnet_number_input();
 int* host_subnet_input(int subnet_number);
 int* array_order_desc(int* array, int array_length);
-void get_subnet_address(int n_host_subnet, char* ip_address, char* cidr_address);
-
+struct ip_address get_subnet_address(int n_host_subnet, struct ip_address address_ip, char** prev_subnet, int array_length);
 
 int main()
 {
-	typedef struct ip_address
-	{
-		char *address;
-		char *cidr_address;
-		char *subnet_mask;
-	} ip_address;
 	ip_address address_ip = { NULL, NULL, NULL };
 	int subnet_numbers = 0;
 
@@ -79,11 +104,27 @@ int main()
 	address_ip.cidr_address = cidr_address_input();
 	address_ip.subnet_mask = get_subnet_mask(address_ip.cidr_address);
 	subnet_numbers = subnet_number_input();
-
 	int *host_number = calloc(subnet_numbers, sizeof(int));
 	host_number = host_subnet_input(subnet_numbers);
 
-	get_subnet_address(host_number[0], address_ip.address, address_ip.cidr_address);
+	//char* subnet_address = calloc(255, sizeof(char));
+	//subnet_address = "";
+	int* ordered_array = calloc(subnet_numbers, sizeof(int));
+	ordered_array = array_order_desc(host_number, subnet_numbers);
+
+	char **prev_subnet = calloc(subnet_numbers, sizeof(char*));
+	for(int i = 0; i < subnet_numbers; ++i)
+		prev_subnet[i] = calloc(255, sizeof(char));
+
+	ip_address subnet_address = { NULL , NULL , NULL };
+
+	for(int i = 0; i < subnet_numbers; ++i)
+	{
+		subnet_address = get_subnet_address(ordered_array[i], address_ip, prev_subnet, subnet_numbers);
+		printf("Address for the subnet n. %d: %s%s ----- Subnet mask: %s\n", (i + 1), subnet_address.address, subnet_address.cidr_address, subnet_address.subnet_mask);
+		prev_subnet[i] = subnet_address.address;
+	}
+
 
 	return 0;
 }
@@ -379,8 +420,7 @@ int* host_subnet_input(int subnet_number)
 			{
 				LOG_ERR("You have to insert numbers!\n");
 			}
-		}while(right_input != 1);
-	}
+		}while(right_input != 1);	}
 
 	return host_number;
 }
@@ -401,25 +441,83 @@ int* array_order_desc(int* array, int array_length)
 	}
 	return array;
 }
-
-void get_subnet_address(int n_host_subnet, char* ip_address, char* cidr_address)
+//TODO funziona ma devo aggiustare la questione degli indirizzi ripetuti, avviare per vedere
+struct ip_address get_subnet_address(int n_host_subnet, struct ip_address address_ip, char** prev_subnet, int array_length)
 {
-	char* n_network_bits = calloc(2, sizeof(char));
-	strncpy(n_network_bits, cidr_address + 1, 2);
+	struct ip_address subnet_address;
+	subnet_address.address = calloc(255, sizeof(char));
+	subnet_address.cidr_address = calloc(3, sizeof(char));
+	subnet_address.subnet_mask = calloc(255, sizeof(char));
+
+	char* ip_address = calloc(255, sizeof(char));
+	strncpy(ip_address, address_ip.address, strlen(address_ip.address));
+
+	char** previous_subnet = calloc(array_length, sizeof(char*));
+
+	for(int i = 0; i < array_length; ++i)
+	{
+		previous_subnet[i] = calloc(255, sizeof(char));
+		strncpy(previous_subnet[i], prev_subnet[i], strlen(prev_subnet[i]));
+	}
+
+	char* cidr_number = calloc(2, sizeof(char));
+	strncpy(cidr_number, address_ip.cidr_address + 1, 2);
+	int n_network_bits = atoi(cidr_number);
 
 	char* binary_ip = calloc(255, sizeof(char));
 	binary_ip = get_binary_ip_address(ip_address);
 
 	int n_dots = 0;
-	if(atoi(n_network_bits) >= 8)
+	if(n_network_bits >= 8)
 		n_dots = 1;
-	if(atoi(n_network_bits) >= 16)
+	if(n_network_bits >= 16)
 		n_dots = 2;
-	if(atoi(n_network_bits) >= 24)
+	if(n_network_bits >= 24)
 		n_dots = 3;
-	memset(binary_ip + atoi(n_network_bits) + n_dots, '0', 32 - atoi(n_network_bits) - n_dots);
-	char* binary_network_address = insert_dots_address(binary_ip, 8, 8, 8, 8);
-	char* network_address_decimal = get_decimal_address(binary_network_address);
-	printf("%s", network_address_decimal);
 
+	char* host_portion = memset(binary_ip + n_network_bits + n_dots, '0', 32 - n_network_bits - n_dots);
+	int necessary_host_bit = ceil(log(n_host_subnet + 2) / log(2));
+	int max_n_subnet = pow(2, (32 - n_network_bits - necessary_host_bit));
+
+	char* extra_network_portion = calloc(32, sizeof(char));
+	strncpy(extra_network_portion, host_portion, (32 - n_network_bits - necessary_host_bit));
+	int decimal_network_portion = atoi(extra_network_portion);
+
+	char* address_subnet = calloc(255, sizeof(char));
+	bool new_subnet = false;
+
+	int cidr_address_subnet_number = 0;
+
+	char* cidr_address_subnet = calloc(3, sizeof(char));
+	cidr_address_subnet[0] = '/';
+	char* cidr_subnet_number = calloc(2, sizeof(char));
+	for(int i = 0; i < max_n_subnet; ++i)
+	{
+		strncpy(binary_ip + n_network_bits, get_binary_number(decimal_network_portion, (32 - n_network_bits - necessary_host_bit)), (32 - n_network_bits - necessary_host_bit));
+		strncpy(subnet_address.address, get_decimal_address(insert_dots_address(binary_ip, 8, 8, 8, 8)), strlen(get_decimal_address(insert_dots_address(binary_ip, 8, 8, 8, 8))));
+
+		for(int i = 0; i < array_length; ++i)
+		{
+			if(strcmp(subnet_address.address, previous_subnet[i]) != 0)
+			{
+				new_subnet = true;
+			} else if(strcmp(subnet_address.address, previous_subnet[i]) == 0)
+			{
+				new_subnet = false;
+				break;
+			}
+		}
+		decimal_network_portion++;
+
+		if(new_subnet)
+		{
+			cidr_address_subnet_number = 32 - necessary_host_bit;
+			itoa(cidr_address_subnet_number, cidr_subnet_number);
+			strcat(cidr_address_subnet, cidr_subnet_number);
+			subnet_address.cidr_address = cidr_address_subnet;
+			subnet_address.subnet_mask = get_decimal_address(get_subnet_mask(subnet_address.cidr_address));
+			break;
+		}
+	}
+	return subnet_address;
 }
