@@ -82,6 +82,13 @@ typedef struct ip_address
 	char *subnet_mask;
 } ip_address;
 
+typedef struct addressing_scheme
+{
+    char *net_address;
+    char **host_addresses;
+    char *broadcast_address;
+} addressing_scheme;
+
 char* get_binary_ip_adress(char* ip_address);
 char* get_decimal_address(char* binary_address);
 bool check_cidr_address(char *cidr_address);
@@ -93,6 +100,7 @@ int subnet_number_input();
 int* host_subnet_input(int subnet_number);
 int* array_order_desc(int* array, int array_length);
 struct ip_address get_subnet_address(int n_host_subnet, struct ip_address address_ip, char** prev_subnet, int array_length);
+struct addressing_scheme do_addressing(struct ip_address);
 
 int main()
 {
@@ -520,4 +528,25 @@ struct ip_address get_subnet_address(int n_host_subnet, struct ip_address addres
 		}
 	}
 	return subnet_address;
+}
+
+struct addressing_scheme do_addressing(struct ip_address)
+{
+    struct addressing_scheme addressing_plan;
+    addressing_plan.broadcast_address = calloc(255, sizeof(char));
+    char* cidr_number = calloc(2, sizeof(char));
+	strncpy(cidr_number, ip_address.cidr_address + 1, 2);
+	int n_host_bits = 32 - atoi(cidr_number);
+	
+	int n_hosts = pow(2, n_host_bits) - 2;
+	addressing_plan.host_addresses = calloc(n_hosts, sizeof(char*));
+	
+	for(int i = 0; i < n_hosts; ++i)
+	{
+	    addressing_plan.host_addresses[i] = calloc(255, sizeof(char));
+	}
+	
+    strncpy(addressing_plan.net_address, ip_address.address, strlen(ip_address.address));
+    //TODO host_addresses
+    //TODO broadcast_address
 }
