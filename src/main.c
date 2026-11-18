@@ -5,10 +5,10 @@
 #include <stdbool.h>
 #include <math.h>
 
-#include "utils.h"
-#include "ipv4.h"
-#include "subnet.h"
-#include "input_handler.h"
+#include "include/utils.h"
+#include "include/ipv4.h"
+#include "include/subnet.h"
+#include "include/input_handler.h"
 
 char* get_binary_ip_adress(char* ip_address);
 char* get_decimal_address(char* binary_address);

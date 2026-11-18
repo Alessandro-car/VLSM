@@ -1,4 +1,4 @@
-#include "subnet.h"
+#include "include/subnet.h"
 
 char* get_net_addr(subnet_t subnet) {
 	return subnet.net_addr;
