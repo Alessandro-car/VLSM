@@ -5,89 +5,10 @@
 #include <stdbool.h>
 #include <math.h>
 
-#define ANSI_COLOR_RED     "\x1b[31m"
-#define ANSI_COLOR_GREEN   "\x1b[32m"
-#define ANSI_COLOR_YELLOW  "\x1b[33m"
-#define ANSI_COLOR_BLUE    "\x1b[34m"
-#define ANSI_COLOR_MAGENTA "\x1b[35m"
-#define ANSI_COLOR_CYAN    "\x1b[36m"
-#define ANSI_COLOR_RESET   "\x1b[0m"
-
-#define LOG_ERR(message) printf("%s%s%s", ANSI_COLOR_RED, message, ANSI_COLOR_RESET)
-
-void reverse(char s[])
-{
-	int i, j;
-  char c;
-
-  for (i = 0, j = strlen(s)-1; i<j; i++, j--)
-	{
-  	c = s[i];
-    s[i] = s[j];
-    s[j] = c;
-  }
-}
-
-//Function to convert an integer to an array of chars
-void itoa(int n, char s[])
-{
-     int i, sign;
-
-     if ((sign = n) < 0)  /* record sign */
-         n = -n;          /* make n positive */
-     i = 0;
-     do {       /* generate digits in reverse order */
-         s[i++] = n % 10 + '0';   /* get next digit */
-     } while ((n /= 10) > 0);     /* delete it */
-     if (sign < 0)
-         s[i++] = '-';
-     s[i] = '\0';
-     reverse(s);
-}
-
-char* get_binary_number(int number, int n_bits)
-{
-
-	char* bits = calloc(n_bits, sizeof(char));
-	int *rem = calloc(1024, sizeof(int));
-	int index = 0;
-
-	while(number > 0)
-	{
-		rem[index] = number % 2;
-		number /= 2;
-		++index;
-	}
-
-	while(index < n_bits)
-	{
-		rem[index] = 0;
-		++index;
-	}
-
-	for(int i = index - 1; i >= 0; --i)
-	{
-		bits[n_bits - 1 - i] = rem[i] + '0';
-	}
-
-	return bits;
-}
-
-void clear_stdin_buffer();
-
-typedef struct ip_address
-{
-	char *address;
-	char *cidr_address;
-	char *subnet_mask;
-} ip_address;
-
-typedef struct addressing_scheme
-{
-    char *net_address;
-    char **host_addresses;
-    char *broadcast_address;
-} addressing_scheme;
+#include "utils.h"
+#include "ipv4.h"
+#include "subnet.h"
+#include "input_handler.h"
 
 char* get_binary_ip_adress(char* ip_address);
 char* get_decimal_address(char* binary_address);
@@ -537,15 +458,15 @@ struct addressing_scheme do_addressing(struct ip_address)
     char* cidr_number = calloc(2, sizeof(char));
 	strncpy(cidr_number, ip_address.cidr_address + 1, 2);
 	int n_host_bits = 32 - atoi(cidr_number);
-	
+
 	int n_hosts = pow(2, n_host_bits) - 2;
 	addressing_plan.host_addresses = calloc(n_hosts, sizeof(char*));
-	
+
 	for(int i = 0; i < n_hosts; ++i)
 	{
 	    addressing_plan.host_addresses[i] = calloc(255, sizeof(char));
 	}
-	
+
     strncpy(addressing_plan.net_address, ip_address.address, strlen(ip_address.address));
     //TODO host_addresses
     //TODO broadcast_address
