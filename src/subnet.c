@@ -1,4 +1,4 @@
-#include "include/subnet.h"
+#include "../include/subnet.h"
 
 char* get_net_addr(subnet_t subnet) {
 	return subnet.net_addr;
@@ -14,8 +14,8 @@ char** get_host_range(subnet_t subnet) {
 }
 
 void set_host_range(subnet_t* subnet, const char** host_range) {
-	subnet->host_range = calloc(strlen(host_range) + 1, sizeof(char*));
-	for (size_t i = 0; i < strlen(host_range); i++) {
+	subnet->host_range = calloc(subnet->num_subnet, sizeof(char*));
+	for (size_t i = 0; i < subnet->num_subnet; i++) {
 		subnet->host_range[i] = calloc(strlen(host_range[i]) + 1, sizeof(char));
 		strcpy(subnet->host_range[i], host_range[i]);
 	}

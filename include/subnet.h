@@ -4,6 +4,7 @@
 
 typedef struct {
 	char*  net_addr;
+	size_t num_subnet;
 	char** host_range;
 	char*  broadcast_addr;
 } subnet_t;
