@@ -1,9 +1,20 @@
 #include "../include/input_handler.h"
 
-//TODO: Insert check for input address input
-void ip_address_input(char* addr) {
-	printf("Insert the ip address: ");
-	scanf("%s", addr);
+void ip_address_input(char addr[NUM_OCTETS][OCTET_BIT_SIZE]) {
+	for (int i = 0; i < NUM_OCTETS; i++) {
+		int octet = -1;
+
+		printf("Insert the octet n. %d: ", (i + 1));
+		while (octet < 0 || octet > 255) {
+			scanf("%d", &octet);
+			if (octet < 0 || octet > 255) {
+				printf("The value of the octet must be between 0 and 255.\n");
+				printf("Insert the octet n. %d: ", (i + 1));
+			}
+		}
+		strcat(addr[i], to_binary(octet, OCTET_BIT_SIZE));
+	}
+
 	clear_stdin_buffer();
 }
 
