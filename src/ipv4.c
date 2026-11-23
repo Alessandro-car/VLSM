@@ -1,13 +1,13 @@
 #include "../include/ipv4.h"
 #include <string.h>
 
-char* get_addr(ipv4_t ip_addr) {
-	return ip_addr.address;
+address_t get_addr(ipv4_t ip_addr) {
+	return ip_addr.addr;
 }
 
-void set_addr(ipv4_t* ip_addr, const char addr[NUM_OCTETS][OCTET_BIT_SIZE]) {
+void set_addr(ipv4_t* ip_addr, const address_t addr) {
 	for (int i = 0; i < NUM_OCTETS; i++) {
-		strcpy(ip_addr->address[i], addr[i]);
+		strcpy(ip_addr->addr.addr[i], addr.addr[i]);
 	}
 }
 
@@ -19,26 +19,37 @@ void set_cidr(ipv4_t* ip_addr, size_t cidr) {
 	ip_addr->cidr = cidr;
 }
 
-char* get_sub_mask(ipv4_t ip_addr) {
+address_t get_sub_mask(ipv4_t ip_addr) {
 	return ip_addr.sub_mask;
 }
 
-void set_sub_mask(ipv4_t* ip_addr, const char sub_mask[NUM_OCTETS][OCTET_BIT_SIZE]) {
+void set_sub_mask(ipv4_t* ip_addr, const address_t sub_mask) {
 	for (int i = 0; i < NUM_OCTETS; i++) {
-		strcpy(ip_addr->sub_mask[i], sub_mask[i]);
+		strcpy(ip_addr->sub_mask.addr[i], sub_mask.addr[i]);
 	}
-const}
+}
 
 void compute_sub_mask(ipv4_t* ip_addr) {
-	char* sub_mask = calloc(DIM_DEC_IP + 1, sizeof(char));
-	for (size_t i = 0; i < ip_addr->cidr / OCTET_BIT_SIZE; i++) {
-		strcat(sub_mask, "255.");
+	int n_octet = ip_addr->cidr / OCTET_BIT_SIZE;
+	int rem_bits = ip_addr->cidr % OCTET_BIT_SIZE;
+	int i = 0;
+	for (; i < n_octet && i < NUM_OCTETS; i++) {
+		for (int j = 0; j < OCTET_BIT_SIZE; j++)
+			ip_addr->addr.addr[i][j] = '1';
 	}
-	int num = 0;
-	for (size_t i = 0; i < ip_addr->cidr % OCTET_BIT_SIZE; i++) {
-		num += pow(2, (OCTET_BIT_SIZE - 1 - i));
+	if (rem_bits > 0 && i < NUM_OCTETS) {
+		for (int j = 0; j < rem_bits; j++) {
+			ip_addr->addr.addr[i][j] = '1';
+		}
+		for (int j = rem_bits; j < OCTET_BIT_SIZE; j++) {
+			ip_addr->addr.addr[i][j] = '0';
+		}
+		i++;
 	}
-	char* str_num = calloc(OCTET_DEC_SIZE + 1, sizeof(char));
-	itoa(num, str_num);
-	strcat(sub_mask, str_num);
+
+	for (; i < NUM_OCTETS; i++) {
+		for (int j = 0; j < OCTET_BIT_SIZE; j++) {
+			ip_addr->addr.addr[i][j] = '0';
+		}
+	}
 }
