@@ -1,6 +1,6 @@
 #include "../include/input_handler.h"
 
-void ip_address_input(char addr[NUM_OCTETS][OCTET_BIT_SIZE]) {
+void ip_address_input(address_t* addr) {
 	for (int i = 0; i < NUM_OCTETS; i++) {
 		int octet = -1;
 
@@ -12,7 +12,7 @@ void ip_address_input(char addr[NUM_OCTETS][OCTET_BIT_SIZE]) {
 				printf("Insert the octet n. %d: ", (i + 1));
 			}
 		}
-		strcat(addr[i], to_binary(octet, OCTET_BIT_SIZE));
+		strcpy(addr->addr[i], to_binary(octet, OCTET_BIT_SIZE));
 	}
 
 	clear_stdin_buffer();

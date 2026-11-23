@@ -1,22 +1,17 @@
 #include "../include/address_utils.h"
 
-void binary_to_dec_addr(char dec_addr[NUM_OCTETS][OCTET_DEC_SIZE], const char bin_addr[NUM_OCTETS][OCTET_BIT_SIZE]) {
-
-
+void binary_to_dec_addr(address_t* dec_addr, const address_t bin_addr) {
+	for (int i = 0; i < NUM_OCTETS; i++) {
+		octet_to_decimal_str(bin_addr.addr[i], dec_addr->addr[i], OCTET_DEC_SIZE + 1);
+	}
 }
 
-void format_ipv4_addr(char* converted_addr, const char addr[NUM_OCTETS][OCTET_DEC_SIZE]) {
-	char *p = converted_addr;
-
-	for (int i = 0; i < NUM_OCTETS; i++) {
-			size_t len = strlen(addr[i]);
-			memcpy(p, addr[i], len);
-			p += len;
-
-			if (i < NUM_OCTETS - 1) {
-					*p++ = '.';
-			}
+void octet_to_decimal_str(const char octet[OCTET_BIT_SIZE + 1], char* out, size_t out_size) {
+	if (!octet || !out || out_size == 0)
+		return;
+	uint8_t val = 0;
+	for (int i = 0; i < OCTET_BIT_SIZE; i++) {
+		val = (uint8_t)((val << 1) | (uint8_t)(octet[i] == '1'));
 	}
-
-	*p = '\0';
+	snprintf(out, out_size, "%u", (unsigned int)val);
 }

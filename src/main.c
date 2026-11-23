@@ -25,13 +25,12 @@ int main()
 {
 	ipv4_t address;
 	memset(&address, 0, sizeof(ipv4_t));
-	ip_address_input(address.address);
+	ip_address_input(&address.addr);
 	address.cidr = cidr_input();
-	//TODO: compute_sub_mask() is not right.
 	compute_sub_mask(&address);
 	size_t num_subnet = num_subnet_input();
 	int* num_host = num_host_subnet_input(num_subnet);
-
+	print_ipv4_scheme(address);
 
 	return 0;
 }

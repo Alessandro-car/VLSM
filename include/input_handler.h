@@ -7,7 +7,7 @@
 #include "utils.h"
 #include "address_utils.h"
 
-void ip_address_input(char addr[NUM_OCTETS][OCTET_BIT_SIZE]);
+void ip_address_input(address_t* addr);
 size_t cidr_input();
 size_t num_subnet_input();
 int* num_host_subnet_input(size_t num_subnet);

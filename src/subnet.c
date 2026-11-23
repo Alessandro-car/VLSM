@@ -10,23 +10,25 @@ void set_net_addr(subnet_t* subnet, const address_t net_addr) {
 	}
 }
 
-char** get_host_range(subnet_t subnet) {
+address_t* get_host_range(subnet_t subnet) {
 	return subnet.host_range;
 }
 
-void set_host_range(subnet_t* subnet, const char** host_range) {
-	subnet->host_range = calloc(subnet->num_subnet, sizeof(char*));
+void set_host_range(subnet_t* subnet, const address_t* host_range) {
+	subnet->host_range = calloc(subnet->num_subnet, sizeof(address_t));
 	for (size_t i = 0; i < subnet->num_subnet; i++) {
-		subnet->host_range[i] = calloc(strlen(host_range[i]) + 1, sizeof(char));
-		strcpy(subnet->host_range[i], host_range[i]);
+		for (int j = 0; j < NUM_OCTETS; j++) {
+			strcpy(subnet->host_range[i].addr[j], host_range[i].addr[j]);
+		}
 	}
 }
 
-char* get_broadcast_addr(subnet_t subnet) {
+address_t get_broadcast_addr(subnet_t subnet) {
 	return subnet.broadcast_addr;
 }
 
-void set_broadcast_addr(subnet_t* subnet, const char* broadcast_addr) {
-	subnet->broadcast_addr = calloc(strlen(broadcast_addr) + 1, sizeof(char));
-	strcpy(subnet->broadcast_addr, broadcast_addr);
+void set_broadcast_addr(subnet_t* subnet, const address_t broad_addr) {
+	for (int i = 0; i < NUM_OCTETS; i++) {
+		strcpy(subnet->broadcast_addr.addr[i], broad_addr.addr[i]);
+	}
 }

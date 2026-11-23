@@ -26,7 +26,7 @@ void itoa(int n, char* s) {
 	reverse(s);
 }
 
-char* get_binary_number(int number, int n_bits) {
+char* to_binary(int number, int n_bits) {
 	char* bits = calloc(n_bits, sizeof(char));
 	int* rem = calloc(1024, sizeof(int));
 	int index = 0;

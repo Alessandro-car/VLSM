@@ -35,21 +35,45 @@ void compute_sub_mask(ipv4_t* ip_addr) {
 	int i = 0;
 	for (; i < n_octet && i < NUM_OCTETS; i++) {
 		for (int j = 0; j < OCTET_BIT_SIZE; j++)
-			ip_addr->addr.addr[i][j] = '1';
+			ip_addr->sub_mask.addr[i][j] = '1';
+		ip_addr->sub_mask.addr[i][OCTET_BIT_SIZE] = '\0';
 	}
 	if (rem_bits > 0 && i < NUM_OCTETS) {
 		for (int j = 0; j < rem_bits; j++) {
-			ip_addr->addr.addr[i][j] = '1';
+			ip_addr->sub_mask.addr[i][j] = '1';
 		}
 		for (int j = rem_bits; j < OCTET_BIT_SIZE; j++) {
-			ip_addr->addr.addr[i][j] = '0';
+			ip_addr->sub_mask.addr[i][j] = '0';
 		}
+		ip_addr->sub_mask.addr[i][OCTET_BIT_SIZE] = '\0';
 		i++;
 	}
 
 	for (; i < NUM_OCTETS; i++) {
 		for (int j = 0; j < OCTET_BIT_SIZE; j++) {
-			ip_addr->addr.addr[i][j] = '0';
+			ip_addr->sub_mask.addr[i][j] = '0';
+		}
+		ip_addr->sub_mask.addr[i][OCTET_BIT_SIZE] = '\0';
+	}
+}
+
+void print_ipv4_scheme(const ipv4_t ip_addr) {
+	address_t dec_addr;
+	address_t dec_sub_mask;
+	binary_to_dec_addr(&dec_addr, ip_addr.addr);
+	binary_to_dec_addr(&dec_sub_mask, ip_addr.sub_mask);
+	printf("IP address: ");
+	for (int i = 0; i < NUM_OCTETS; i++) {
+		printf("%s", dec_addr.addr[i]);
+		if (i < NUM_OCTETS - 1)
+			printf(".");
+	}
+	printf("/%zu", ip_addr.cidr);
+	printf("\nSubnet mask: ");
+	for (int i = 0; i < NUM_OCTETS; i++) {
+		printf("%s", dec_sub_mask.addr[i]);
+		if (i < NUM_OCTETS - 1) {
+			printf(".");
 		}
 	}
 }
