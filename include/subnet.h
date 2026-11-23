@@ -5,20 +5,20 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "address_const.h"
+#include "address_utils.h"
 
 typedef struct {
-	char   net_addr[NUM_OCTETS][OCTET_BIT_SIZE];
-	size_t num_subnet;
-	char** host_range;
-	char  broadcast_addr[NUM_OCTETS][OCTET_BIT_SIZE];
+	address_t	 net_addr;
+	size_t 		 num_subnet;
+	address_t* host_range;
+	address_t  broadcast_addr;
 } subnet_t;
 
-char* get_net_addr(subnet_t subnet);
-void set_net_addr(subnet_t* subnet, const char net_addr[OCTET_BIT_SIZE][OCTET_BIT_SIZE]);
-char** get_host_range(subnet_t subnet);
-void set_host_range(subnet_t* subnet, const char** host_range);
-char* get_broadcast_addr(subnet_t subnet);
-void set_broadcast_addr(subnet_t* subnet, const char broadcast_addr[NUM_OCTETS][OCTET_BIT_SIZE]);
+address_t get_net_addr(subnet_t subnet);
+void set_net_addr(subnet_t* subnet, const address_t net_addr);
+address_t* get_host_range(subnet_t subnet);
+void set_host_range(subnet_t* subnet, const address_t* host_range);
+address_t get_broadcast_addr(subnet_t subnet);
+void set_broadcast_addr(subnet_t* subnet, const address_t broad_addr);
 
 #endif

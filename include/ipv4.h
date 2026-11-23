@@ -10,17 +10,17 @@
 #include "address_utils.h"
 
 typedef struct {
-	char 	 address[NUM_OCTETS][OCTET_BIT_SIZE];
-	size_t cidr;
-	char   sub_mask[NUM_OCTETS][OCTET_BIT_SIZE];
+	address_t addr;
+	size_t 		cidr;
+	address_t sub_mask;
 } ipv4_t;
 
-char* get_addr(ipv4_t ip_addr);
-void set_addr(ipv4_t* ip_addr, const char addr[NUM_OCTETS][OCTET_BIT_SIZE]);
+address_t get_addr(ipv4_t ip_addr);
+void set_addr(ipv4_t* ip_addr, const address_t addr);
 size_t get_cidr(ipv4_t ip_addr);
 void set_cidr(ipv4_t* ip_addr, size_t cidr);
-char* get_sub_mask(ipv4_t ip_addr);
-void set_sub_mask(ipv4_t* ip_addr, const char sub_mask[NUM_OCTETS][OCTET_BIT_SIZE]);
+address_t get_sub_mask(ipv4_t ip_addr);
+void set_sub_mask(ipv4_t* ip_addr, const address_t sub_mask);
 void compute_sub_mask(ipv4_t* ip_addr);
 
 #endif

@@ -15,6 +15,11 @@
 
 #include "utils.h"
 
+typedef struct {
+	char addr[NUM_OCTETS][OCTET_BIT_SIZE];
+} address_t;
+
+
 void binary_to_dec_addr(char dec_addr[NUM_OCTETS][OCTET_DEC_SIZE], const char bin_addr[NUM_OCTETS][OCTET_BIT_SIZE]);
 void pretty_print_addr(char* converted_addr, const char addr[NUM_OCTETS][OCTET_DEC_SIZE]);
 
