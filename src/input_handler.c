@@ -12,7 +12,7 @@ void ip_address_input(address_t* addr) {
 				printf("Insert the octet n. %d: ", (i + 1));
 			}
 		}
-		strcpy(addr->addr[i], to_binary(octet, OCTET_BIT_SIZE));
+		addr->addr[i] = octet;
 	}
 
 	clear_stdin_buffer();

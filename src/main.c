@@ -8,29 +8,45 @@
 #include "../include/subnet.h"
 #include "../include/input_handler.h"
 
-//char* get_binary_ip_adress(char* ipv4_t);
-//char* get_decimal_address(char* binary_address);
-//bool check_cidr_address(char *cidr_address);
-//bool check_ipv4_t(char *address_ip);
-//char* get_subnet_mask(char *cidr_address);
-//char* ipv4_t_input();
-//char* cidr_address_input();
-//int subnet_number_input();
-//int* host_subnet_input(int subnet_number);
-//int* array_order_desc(int* array, int array_length);
-//struct ipv4_t get_subnet_address(int n_host_subnet, struct ip_address address_ip, char** prev_subnet, int array_length);
-//struct addressing_scheme do_addressing(struct ipv4_t);
+//TODO: Perform subnetting
 
 int main()
 {
 	ipv4_t address;
+	subnet_t* subnet;
+	size_t num_subnet;
+	int* num_host;
+
+	//subnet_scheme.host_range;
+	//subnet_scheme.broadcast_addr;
+	//subnet_scheme.net_addr
+
 	memset(&address, 0, sizeof(ipv4_t));
 	ip_address_input(&address.addr);
 	address.cidr = cidr_input();
 	compute_sub_mask(&address);
-	size_t num_subnet = num_subnet_input();
-	int* num_host = num_host_subnet_input(num_subnet);
+	num_subnet = num_subnet_input();
+	subnet = calloc(num_subnet, sizeof(subnet_t));
+	for (int i = 0; i < num_subnet; i++) {
+		memset(&subnet[i], 0, sizeof(subnet_t));
+	}
+	num_host = num_host_subnet_input(num_subnet);
+	quicksort_desc(num_host, 0, num_subnet - 1);
 	print_ipv4_scheme(address);
+	for (int i = 0; i < num_subnet; i++) {
+		set_net_addr(&subnet[i], address);
+		set_num_host(&subnet[i], num_host[i]);
+		change_cidr(&subnet[i], get_num_host(subnet[i]));
+		compute_sub_mask(&subnet[i].net_addr);
+		set_host_range(&subnet[i]);
+		set_broadcast_addr(&subnet[i]);
+		print_scheme(subnet[i]);
+		printf("\n\n");
+		address.addr = get_next_address(get_broadcast_addr(subnet[i]));
+		compute_sub_mask(&address);
+		set_cidr(&address, get_cidr(get_net_addr(subnet[i])));
+	}
+
 
 	return 0;
 }

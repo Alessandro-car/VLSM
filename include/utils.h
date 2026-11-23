@@ -15,4 +15,6 @@
 void reverse(char* s);
 void itoa(int n, char* s);
 char* to_binary(int number, int n_bits);
+void quicksort_desc(int* arr, int low, int high);
+int partition(int* arr, int low, int high);
 void clear_stdin_buffer();
