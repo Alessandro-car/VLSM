@@ -1,63 +1,59 @@
 #include "../include/input_handler.h"
 
-void ip_address_input(address_t* addr) {
+static bool read_int(const char* prompt, long min, long max, int* out) {
+	char line[64];
+
+	for (;;) {
+		printf("%s", prompt);
+		if (!fgets(line, sizeof line, stdin)) return false;
+
+		char* end;
+		errno = 0;
+		long value = strtol(line, &end, 10);
+		bool parsed = end != line && errno != ERANGE;
+		while (isspace((unsigned char) *end)) end++;
+
+		if (parsed && *end == '\0' && value >= min && value <= max) {
+			*out = (int) value;
+			return true;
+		}
+		printf("Invalid input. Enter an integer between %ld and %ld.\n", min, max);
+	}
+}
+
+bool ip_address_input(address_t* addr) {
 	for (int i = 0; i < NUM_OCTETS; i++) {
-		int octet = -1;
-
-		printf("Insert the octet n. %d: ", (i + 1));
-		while (octet < 0 || octet > 255) {
-			scanf("%d", &octet);
-			if (octet < 0 || octet > 255) {
-				printf("The value of the octet must be between 0 and 255.\n");
-				printf("Insert the octet n. %d: ", (i + 1));
-			}
-		}
-		addr->addr[i] = octet;
+		char prompt[40];
+		snprintf(prompt, sizeof prompt, "Insert the octet n. %d: ", i + 1);
+		if (!read_int(prompt, 0, 255, &addr->addr[i])) return false;
 	}
-
-	clear_stdin_buffer();
+	return true;
 }
 
-size_t cidr_input() {
-	int cidr = -1;
-	printf("Enter the CIDR address: /");
-	while (cidr < 0 || cidr > 32) {
-		scanf("%d", &cidr);
-		if (cidr < 0 || cidr > 32) {
-			printf("Invalid CIDR address. The value must be between 0 and 32.\n");
-			printf("Enter the CIDR address: /");
-		}
-	}
-	clear_stdin_buffer();
-	return (size_t) cidr;
+bool cidr_input(size_t* cidr) {
+	int value;
+	if (!read_int("Enter the CIDR address: /", 0, 30, &value)) return false;
+	*cidr = (size_t) value;
+	return true;
 }
 
-size_t num_subnet_input() {
-	int num_subnet = -1;
-	printf("Insert the number of the subnets: ");
-	while (num_subnet < 0) {
-		scanf("%d", &num_subnet);
-		if (num_subnet < 0) {
-			printf("Invalid number. The number must be greater than 0.\n");
-			printf("Insert the number of the subnets: ");
-		}
-	}
-	clear_stdin_buffer();
-	return (size_t) num_subnet;
+bool num_subnet_input(size_t* num_subnet) {
+	int value;
+	if (!read_int("Insert the number of the subnets: ", 1, MAX_SUBNETS, &value)) return false;
+	*num_subnet = (size_t) value;
+	return true;
 }
 
 int* num_host_subnet_input(size_t num_subnet) {
 	int* num_hosts = calloc(num_subnet, sizeof(int));
+	if (!num_hosts) return NULL;
+
 	for (size_t i = 0; i < num_subnet; i++) {
-		printf("Insert the number of hosts for the %zu subnet: ", (i + 1));
-		num_hosts[i] = -1;
-		while (num_hosts[i] < 0) {
-			scanf("%d", &num_hosts[i]);
-			if (num_hosts[i] < 0) {
-				printf("Invalid number. The number must be greater than 0.\n");
-				printf("Insert the number of host for the %zu subnet: ", (i + 1));
-			}
-			clear_stdin_buffer();
+		char prompt[64];
+		snprintf(prompt, sizeof prompt, "Insert the number of hosts for subnet %zu: ", i + 1);
+		if (!read_int(prompt, 1, INT_MAX, &num_hosts[i])) {
+			free(num_hosts);
+			return NULL;
 		}
 	}
 	return num_hosts;

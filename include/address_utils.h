@@ -11,17 +11,10 @@
 #define NUM_OCTETS      4
 #define OCTET_BIT_SIZE  8
 #define TOTAL_SIZE_IPV4 (NUM_OCTETS * OCTET_BIT_SIZE)
-#define OCTET_DEC_SIZE  3
-#define N_DOTS 				  3
-#define DIM_DEC_IP 		  ((NUM_OCTETS * OCTET_DEC_SIZE) + N_DOTS)
-#define DIM_BIN_IP      ((NUM_OCTETS * OCTET_BIT_SIZE) + N_DOTS)
-
-#include "utils.h"
 
 typedef struct {
 	int addr[NUM_OCTETS];
 } address_t;
-
 
 address_t get_next_address(const address_t addr);
 size_t compute_n_host_bit(int num_host);

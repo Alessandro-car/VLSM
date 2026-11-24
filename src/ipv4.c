@@ -43,6 +43,12 @@ void compute_sub_mask(ipv4_t* ip_addr) {
 	}
 }
 
+void compute_net_addr(ipv4_t* ip_addr) {
+	compute_sub_mask(ip_addr);
+	for (int i = 0; i < NUM_OCTETS; i++)
+		ip_addr->addr.addr[i] &= ip_addr->sub_mask.addr[i];
+}
+
 void print_ipv4_scheme(const ipv4_t ip_addr) {
 	printf("IP address: ");
 	for (int i = 0; i < NUM_OCTETS; i++) {
