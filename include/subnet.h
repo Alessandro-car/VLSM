@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
 #include "address_utils.h"
 #include "ipv4.h"
@@ -25,7 +24,6 @@ void set_host_range(subnet_t* subnet);
 address_t get_broadcast_addr(subnet_t subnet);
 void set_broadcast_addr(subnet_t* subnet);
 
-size_t compute_n_host_bit(subnet_t subnet);
 void change_cidr(subnet_t* subnet, size_t n_host_bit);
 void print_scheme(subnet_t subnet);
 #endif

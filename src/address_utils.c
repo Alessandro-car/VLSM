@@ -15,6 +15,12 @@ address_t get_next_address(const address_t addr) {
 	return overflow;
 }
 
+
+size_t compute_n_host_bit(int num_host) {
+	return (size_t) ceil(log2((double) num_host + 2));
+}
+
+
 void print_address(address_t addr) {
 	for (size_t i = 0; i < NUM_OCTETS; i++) {
 		printf("%d", addr.addr[i]);

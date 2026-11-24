@@ -30,23 +30,17 @@ void set_sub_mask(ipv4_t* ip_addr, const address_t sub_mask) {
 }
 
 void compute_sub_mask(ipv4_t* ip_addr) {
-	int n_octet = ip_addr->cidr / OCTET_BIT_SIZE;
-	int rem_bits = ip_addr->cidr % OCTET_BIT_SIZE;
-	int i = 0;
-	for (; i < n_octet && i < NUM_OCTETS; i++) {
-		for (int j = 0; j < OCTET_BIT_SIZE; j++)
-			ip_addr->sub_mask.addr[i] = (int)0xFF;
-	}
-	if (rem_bits > 0 && i < NUM_OCTETS) {
-		for (int j = 0; j < rem_bits; j++) {
-			ip_addr->addr.addr[i] = (int)((0xFFu << (OCTET_BIT_SIZE - rem_bits)) & 0xFFu);
-      i++;
-		}
-	}
+	size_t n_octet = ip_addr->cidr / OCTET_BIT_SIZE;
+	size_t rem_bits = ip_addr->cidr % OCTET_BIT_SIZE;
 
-	for (; i < 4; i++) {
-  	ip_addr->addr.addr[i] = 0;
-  }
+	for (size_t i = 0; i < NUM_OCTETS; i++) {
+		if (i < n_octet)
+			ip_addr->sub_mask.addr[i] = 0xFF;
+		else if (i == n_octet && rem_bits > 0)
+			ip_addr->sub_mask.addr[i] = (0xFFu << (OCTET_BIT_SIZE - rem_bits)) & 0xFFu;
+		else
+			ip_addr->sub_mask.addr[i] = 0;
+	}
 }
 
 void print_ipv4_scheme(const ipv4_t ip_addr) {

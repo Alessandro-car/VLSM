@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <math.h>
 #include "utils.h"
 
 #define NUM_OCTETS      4
@@ -23,6 +24,7 @@ typedef struct {
 
 
 address_t get_next_address(const address_t addr);
+size_t compute_n_host_bit(int num_host);
 void print_address(address_t addr);
 
 #endif

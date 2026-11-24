@@ -23,9 +23,9 @@ address_t* get_host_range(subnet_t subnet) {
 }
 
 void set_host_range(subnet_t* subnet) {
-	subnet->host_range = calloc(subnet->num_host, sizeof(address_t));
+	subnet->host_range = calloc(subnet->num_host - 2, sizeof(address_t));
 	subnet->host_range[0] = get_next_address(subnet->net_addr.addr);
-	for (size_t i = 1; i < subnet->num_host; i++) {
+	for (size_t i = 1; i < subnet->num_host - 2; i++) {
 		subnet->host_range[i] = get_next_address(subnet->host_range[i - 1]);
 	}
 }
@@ -35,11 +35,7 @@ address_t get_broadcast_addr(subnet_t subnet) {
 }
 
 void set_broadcast_addr(subnet_t* subnet) {
-	subnet->broad_addr = get_next_address(subnet->host_range[subnet->num_host - 1]);
-}
-
-size_t compute_n_host_bit(subnet_t subnet) {
-	return (size_t) ceil(log2((double) get_cidr(subnet.net_addr)));
+	subnet->broad_addr = get_next_address(subnet->host_range[subnet->num_host - 3]);
 }
 
 void change_cidr(subnet_t* subnet, size_t n_host_bit) {
@@ -59,10 +55,11 @@ void change_cidr(subnet_t* subnet, size_t n_host_bit) {
 
 void print_scheme(subnet_t subnet) {
 	print_ipv4_scheme(subnet.net_addr);
-	printf("\nNum host: %zu", subnet.num_host);
-	for (size_t i = 0; i < subnet.num_host; i++) {
+	printf("\nNum host: %zu\n", subnet.num_host);
+	for (size_t i = 0; i < subnet.num_host - 2; i++) {
 		print_address(subnet.host_range[i]);
 		printf("\n");
 	}
+	printf("Broadcast address: ");
 	print_address(subnet.broad_addr);
 }
