@@ -15,12 +15,12 @@ DEPS := $(OBJS:.o=.d)
 
 all: $(TARGET)
 
-debug: CFLAGS += -g -O0 -fsanitize=address,undefined
-debug: LDFLAGS += -fsanitize=address,undefined
-debug: clean all
+debug: clean
+	$(MAKE) CFLAGS="$(CFLAGS) -g -O0 -fsanitize=address,undefined" \
+	        LDFLAGS="$(LDFLAGS) -fsanitize=address,undefined" all
 
-release: CFLAGS += -O2 -DNDEBUG
-release: clean all
+release: clean
+	$(MAKE) CFLAGS="$(CFLAGS) -O2 -DNDEBUG" all
 
 $(TARGET): $(OBJS) | $(BIN_DIR)
 	$(CC) $(OBJS) $(LDFLAGS) -o $@

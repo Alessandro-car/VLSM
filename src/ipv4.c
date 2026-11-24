@@ -49,19 +49,3 @@ void compute_net_addr(ipv4_t* ip_addr) {
 		ip_addr->addr.addr[i] &= ip_addr->sub_mask.addr[i];
 }
 
-void print_ipv4_scheme(const ipv4_t ip_addr) {
-	printf("IP address: ");
-	for (int i = 0; i < NUM_OCTETS; i++) {
-		printf("%d", ip_addr.addr.addr[i]);
-		if (i < NUM_OCTETS - 1)
-			printf(".");
-	}
-	printf("/%zu", ip_addr.cidr);
-	printf("\nSubnet mask: ");
-	for (int i = 0; i < NUM_OCTETS; i++) {
-		printf("%d", ip_addr.sub_mask.addr[i]);
-		if (i < NUM_OCTETS - 1) {
-			printf(".");
-		}
-	}
-}

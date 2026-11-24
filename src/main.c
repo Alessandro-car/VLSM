@@ -48,7 +48,6 @@ int main(void) {
 	}
 	printf("\n");
 
-	/* Addresses still free in the parent network. */
 	uint64_t remaining = 1ULL << (TOTAL_SIZE_IPV4 - address.cidr);
 	address_t next = address.addr;
 	size_t created = 0;
